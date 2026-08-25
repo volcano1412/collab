@@ -126,6 +126,46 @@ class CollabApiIntegrationTest {
         assertThat(operations).isEqualTo(16);
     }
 
+    @Test
+    void openApiPublishesCurrentUserAsRequiredHeaderInsteadOfQueryParameter() throws Exception {
+        String body = mvc.perform(get("/v3/api-docs"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        JsonNode paths = mapper.readTree(body).get("paths");
+
+        int securedOperations = 0;
+        for (var pathIterator = paths.fields(); pathIterator.hasNext();) {
+            var path = pathIterator.next();
+            for (var operationIterator = path.getValue().fields(); operationIterator.hasNext();) {
+                var operation = operationIterator.next();
+                boolean registration = path.getKey().equals("/api/users")
+                        && operation.getKey().equals("post");
+                JsonNode parameters = operation.getValue().path("parameters");
+
+                boolean hasUserHeader = false;
+                for (JsonNode parameter : parameters) {
+                    String name = parameter.path("name").asText();
+                    String location = parameter.path("in").asText();
+                    assertThat(location.equals("query") && (name.equals("u") || name.equals("requester")))
+                            .as("custom current-user parameter must not leak as query parameter")
+                            .isFalse();
+                    if (name.equals("X-User-Id") && location.equals("header")) {
+                        hasUserHeader = parameter.path("required").asBoolean();
+                    }
+                }
+
+                if (registration) assertThat(hasUserHeader).isFalse();
+                else {
+                    assertThat(hasUserHeader)
+                            .as(operation.getKey().toUpperCase() + " " + path.getKey())
+                            .isTrue();
+                    securedOperations++;
+                }
+            }
+        }
+        assertThat(securedOperations).isEqualTo(15);
+    }
+
     private long createUser(String email, String name) throws Exception {
         String body = mvc.perform(post("/api/users").contentType(MediaType.APPLICATION_JSON)
                         .content("{\"email\":\"" + email + "\",\"name\":\"" + name + "\"}"))
