@@ -1,4 +1,73 @@
 package org.project.collab.project.domain;
-import jakarta.persistence.*; import java.time.LocalDateTime; import org.hibernate.annotations.OnDelete; import org.hibernate.annotations.OnDeleteAction; import org.project.collab.user.domain.User; import org.springframework.data.annotation.CreatedDate; import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-@Entity @Table(name="project_members",uniqueConstraints=@UniqueConstraint(name="uq_member_project_user",columnNames={"project_id","user_id"}),indexes=@Index(name="idx_member_user",columnList="user_id")) @EntityListeners(AuditingEntityListener.class)
-public class ProjectMember { @Id @GeneratedValue(strategy=GenerationType.IDENTITY) private Long id; @ManyToOne(fetch=FetchType.LAZY,optional=false) @JoinColumn(name="project_id") @OnDelete(action=OnDeleteAction.CASCADE) private Project project; @ManyToOne(fetch=FetchType.LAZY,optional=false) @JoinColumn(name="user_id") private User user; @Enumerated(EnumType.STRING) @Column(nullable=false,length=10) private ProjectRole role; @CreatedDate @Column(nullable=false,updatable=false) private LocalDateTime joinedAt; protected ProjectMember(){} public ProjectMember(Project p,User u,ProjectRole r){project=p;user=u;role=r;} public void changeRole(ProjectRole r){role=r;} public Long getId(){return id;} public Project getProject(){return project;} public User getUser(){return user;} public ProjectRole getRole(){return role;} public LocalDateTime getJoinedAt(){return joinedAt;} }
+
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.project.collab.user.domain.User;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+@Entity
+@Table(
+    name = "project_members",
+    uniqueConstraints =
+        @UniqueConstraint(
+            name = "uq_member_project_user",
+            columnNames = {"project_id", "user_id"}),
+    indexes = @Index(name = "idx_member_user", columnList = "user_id"))
+@EntityListeners(AuditingEntityListener.class)
+public class ProjectMember {
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "project_id")
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  private Project project;
+
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "user_id")
+  private User user;
+
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false, length = 10)
+  private ProjectRole role;
+
+  @CreatedDate
+  @Column(nullable = false, updatable = false)
+  private LocalDateTime joinedAt;
+
+  protected ProjectMember() {}
+
+  public ProjectMember(Project p, User u, ProjectRole r) {
+    project = p;
+    user = u;
+    role = r;
+  }
+
+  public void changeRole(ProjectRole r) {
+    role = r;
+  }
+
+  public Long getId() {
+    return id;
+  }
+
+  public Project getProject() {
+    return project;
+  }
+
+  public User getUser() {
+    return user;
+  }
+
+  public ProjectRole getRole() {
+    return role;
+  }
+
+  public LocalDateTime getJoinedAt() {
+    return joinedAt;
+  }
+}

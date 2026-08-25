@@ -1,3 +1,42 @@
 package org.project.collab.project.domain;
-import jakarta.persistence.*; import org.project.collab.common.domain.BaseTimeEntity;
-@Entity @Table(name="projects") public class Project extends BaseTimeEntity { @Id @GeneratedValue(strategy=GenerationType.IDENTITY) private Long id; @Column(nullable=false,length=100) private String name; @Column(length=500) private String description; protected Project(){} public Project(String n,String d){name=n;description=d;} public void update(String n,boolean np,String d,boolean dp){if(np)name=n;if(dp)description=d;} public Long getId(){return id;} public String getName(){return name;} public String getDescription(){return description;} }
+
+import jakarta.persistence.*;
+import org.project.collab.common.domain.BaseTimeEntity;
+
+@Entity
+@Table(name = "projects")
+public class Project extends BaseTimeEntity {
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  @Column(nullable = false, length = 100)
+  private String name;
+
+  @Column(length = 500)
+  private String description;
+
+  protected Project() {}
+
+  public Project(String n, String d) {
+    name = n;
+    description = d;
+  }
+
+  public void update(String n, boolean np, String d, boolean dp) {
+    if (np) name = n;
+    if (dp) description = d;
+  }
+
+  public Long getId() {
+    return id;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+}
